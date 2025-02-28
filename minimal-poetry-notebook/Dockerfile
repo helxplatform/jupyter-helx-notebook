@@ -9,8 +9,9 @@ RUN apt update -y
 RUN sudo apt-get install software-properties-common -y && \
     sudo add-apt-repository ppa:git-core/ppa
 
-# These packages are necessary for some Poetry packages to correctly install later (like xmlsec)
-RUN apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl curl git libc-bin locales libcurl3-gnutls
+# These packages are necessary for some Poetry packages to correctly install later (like xmlsec) and LDAP
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y pkg-config libxml2-dev libxmlsec1-dev \
+    libxmlsec1-openssl curl git libc-bin locales libcurl3-gnutls libnss-ldap
 
 # These packages are necessary for psycopg2 to be installed later
 RUN apt-get install -y build-essential python3-dev libpq-dev libpq-dev

@@ -24,7 +24,7 @@ cd /
 
 # Add other init scripts in $HELX_SCRIPTS_DIR with ".sh" as their extension.
 # To run in a certain order, name them appropriately.
-HELX_SCRIPT_DIR=/helx
+HELX_SCRIPT_DIR=/helx-startup
 INIT_SCRIPTS_TO_RUN=$(ls -1 $HELX_SCRIPT_DIR/*.sh) || true
 for INIT_SCRIPT in $INIT_SCRIPTS_TO_RUN
 do

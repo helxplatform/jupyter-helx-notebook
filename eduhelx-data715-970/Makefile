@@ -1,4 +1,4 @@
-# Makefile for building a docker iamge.
+# Makefile for building a docker image.
 
 # Thanks to  https://gist.github.com/mpneuried/0594963ad38e68917ef189b4e6a269db
 # for a lot of this.

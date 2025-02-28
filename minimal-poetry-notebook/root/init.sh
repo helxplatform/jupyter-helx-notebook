@@ -47,4 +47,5 @@ jupyter lab \
     --ServerApp.base_url=${NB_PREFIX} \
     --ServerApp.allow_origin="*" \
     --ServerApp.root_dir=${NB_ROOT_DIR} \
-    --ServerApp.default_url=${NB_PREFIX}/lab
+    --ServerApp.default_url=${NB_PREFIX}/lab \
+    --ContentsManager.allow_hidden=True
