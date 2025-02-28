@@ -12,6 +12,12 @@ RUN sudo apt-get install software-properties-common -y && \
 # These packages are necessary for some Poetry packages to correctly install later (like xmlsec)
 RUN apt-get install -y pkg-config libxml2-dev libxmlsec1-dev libxmlsec1-openssl curl git libc-bin locales libcurl3-gnutls
 
+# These packages are necessary for psycopg2 to be installed later
+RUN apt-get install -y build-essential python3-dev libpq-dev libpq-dev
+
+# Install psycopg2 using regular pip
+RUN pip install psycopg2
+
 ENV POETRY_CONFIG_DIR=/opt/poetry/.config \
     POETRY_HOME=/opt/poetry \
     POETRY_CACHE_DIR=/opt/poetry/.cache \
@@ -21,6 +27,9 @@ ENV POETRY_CONFIG_DIR=/opt/poetry/.config \
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 COPY root /
+
+RUN fix-permissions "/home" && \
+    chmod 664 /etc/group
 
 USER $NB_USER
 

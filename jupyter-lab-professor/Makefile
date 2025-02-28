@@ -61,8 +61,6 @@ release: build-nc publish ## Make a release by building and publishing tagged co
 
 # Docker publish
 publish: publish-latest publish-version ## Publish tags
-	@echo 'publish all tags to $(IMAGE_REPO)'
-	docker push -a $(IMAGE_REPO)/$(APP_NAME)
 
 publish-latest: tag-latest ## Publish the `latest` tagged container to ECR
 	@echo 'publish latest to $(IMAGE_REPO)'
