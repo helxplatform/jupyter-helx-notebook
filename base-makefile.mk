@@ -3,12 +3,16 @@
 # Thanks to  https://gist.github.com/mpneuried/0594963ad38e68917ef189b4e6a269db
 # for a lot of this.
 
+# get the current datetime
 DATETIME := $(shell /bin/date "+%Y%m%d%H%M")
 # get the latest commit hash in the short form
 COMMIT_SHORT_HASH := $(shell git rev-parse --short HEAD)
-COMMIT_DATETIME := $(shell git log -1 --format=%cd --date=format:"%Y%m%d%H%M")
+COMMIT_DATETIME   := $(shell git log -1 --format=%cd --date=format:"%Y%m%d%H%M")
 # add the commit date/time
 COMMIT_HASH_TAG := $(COMMIT_SHORT_HASH)-$(COMMIT_DATETIME)
+# set the ports for running an image
+FORWARDING_PORT := 8080
+CONTAINER_PORT  := 8080
 
 # HELP
 # This will output the help for each task
@@ -44,7 +48,7 @@ build-with-logs: ## Build the image without caching.
 
 run: ## Run container on port configured in `config.env`
 	docker run -i -t --rm --env-file=./run.env -u $(UID):$(GID) \
-	  -v $(PWD)/host:/host -p=$(FORWARDING_PORT):$(CONTAINER_PORT) \
+		-p=$(FORWARDING_PORT):$(CONTAINER_PORT) \
 	  --name="$(APP_NAME)" $(APP_NAME) $(ENTRYPOINT)
 
 up: build run ## Run container on port configured in `config.env` (Alias to run)
