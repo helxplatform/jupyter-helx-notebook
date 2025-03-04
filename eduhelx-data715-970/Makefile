@@ -9,4 +9,4 @@ cnf ?= config.env
 include $(cnf)
 export $(shell sed 's/=.*//' $(cnf))
 
-include $(CURDIR)/../Make.mk
+include $(CURDIR)/../base-makefile.mk
