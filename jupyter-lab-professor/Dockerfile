@@ -23,7 +23,7 @@ RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry install --no-interaction --no-ans
 # Remove Poetry files from container, as they're no longer needed
 RUN rm $POETRY_HOME/pyproject.toml $POETRY_HOME/poetry.lock
 
-RUN pip install git+https://github.com/helxplatform/eduhelx-jupyterlab-prof-ext.git
+RUN pip install git+https://github.com/helxplatform/eduhelx-jupyterlab-prof-ext.git@hotfix-12-18-2024
 RUN jupyter server extension enable eduhelx_jupyterlab_prof
 
 RUN pip install --upgrade git+https://github.com/helxplatform/eduhelx-utils.git

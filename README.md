@@ -14,23 +14,23 @@ To build the image you can use the basic docker command or use the included Make
 ```
   make build
 ```
-  To build the image without using the docker cache you can use the 'build-nc' argument.
+To build the image without using the docker cache you can use the `build-nc` target instead. You can also use the `build-keep-logs` target to build normally but keep the logs during each build stage (which uses the `--progress=plain` argument).
 
 ## Running Locally
 
 ```
   make run
 ```
-  Then connect to localhost:8888 in your web browser.
+Then connect to localhost:8080 in your web browser.
 
 ## Publishing Image to Registry
-  To push the image to the configured registry (in config.env) use the 'publish' argument.
+To push the image to the configured registry (in config.env) use the 'publish' argument.
 ```
   make publish
 ```
-  To build the image without the docker cache and publish you can use the 'release' argument.
+To build the image without the docker cache and publish you can use the 'release' argument.
 
 ## Container Environment Variables
-  USER | NB_USER : Used to change the username of the process running within the container.
+USER | NB_USER : Used to change the username of the process running within the container.
   
-  NB_PREFIX : Used to set the URL path prefix to access the Jupyter datascience-notebook. 
+NB_PREFIX : Used to set the URL path prefix to access the Jupyter datascience-notebook.
