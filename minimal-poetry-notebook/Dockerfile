@@ -1,9 +1,9 @@
-FROM containers.renci.org/helxplatform/jupyter/docker-stacks/minimal-notebook:cuda-202309182143
+FROM containers.renci.org/helxplatform/jupyter/docker-stacks/minimal-notebook:cuda
 
 USER root
 
 # Update available packages in the package index
-RUN apt update -y
+RUN apt-get update && apt-get upgrade -y
 
 # Add ppa for git install later
 RUN sudo apt-get install software-properties-common -y && \

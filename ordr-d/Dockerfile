@@ -1,5 +1,5 @@
-ARG BASE_IMAGE=containers.renci.org/helxplatform/jupyter/docker-stacks/scipy-notebook
-ARG BASE_IMAGE_TAG=cuda-202309182143
+ARG BASE_IMAGE=containers.renci.org/helxplatform/jupyter/docker-stacks/minimal-poetry-notebook
+ARG BASE_IMAGE_TAG=security-upgrades
 FROM $BASE_IMAGE:$BASE_IMAGE_TAG
 
 USER root

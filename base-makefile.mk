@@ -25,7 +25,7 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 build: ## Build the image.
-	docker build --pull \
+	docker build \
 		--platform=linux/amd64 . \
 		--build-arg BASE_IMAGE=${BASE_IMAGE} \
 		--build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
