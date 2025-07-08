@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=containers.renci.org/helxplatform/jupyter/minimal-poetry-notebook
-ARG BASE_IMAGE_TAG=security-upgrades
+ARG BASE_IMAGE_TAG=latest
 FROM $BASE_IMAGE:$BASE_IMAGE_TAG
 
 USER root
