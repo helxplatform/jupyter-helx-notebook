@@ -1,9 +1,9 @@
-FROM containers.renci.org/helxplatform/jupyter/docker-stacks/minimal-notebook:cuda-202309182143
+FROM containers.renci.org/helxplatform/jupyter/docker-stacks/minimal-notebook:latest
 
 USER root
 
 # Update available packages in the package index
-RUN apt update -y
+RUN apt-get update && apt-get upgrade -y
 
 # Add ppa for git install later
 RUN sudo apt-get install software-properties-common -y && \
@@ -26,7 +26,7 @@ RUN apt-get upgrade -y libaom3 openexr zlib1g-dev
 RUN python3 -m pip install pipx && pipx ensurepath
 
 # Set $POETRY_HOME env var for child images to reference and add it to the $PATH
-ENV POETRY_HOME="/${HOME}/.local"
+ENV POETRY_HOME="${HOME}/.local"
 ENV PATH="${POETRY_HOME}/bin:$PATH"
 
 # Install Poetry
