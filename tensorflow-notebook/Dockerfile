@@ -7,6 +7,7 @@ USER root
 WORKDIR /
 # COPY root .
 
+RUN apt-get update
 # This is necessary because by default Poetry creates a virtual environment, which we don't want in production
 RUN $POETRY_HOME/bin/poetry config virtualenvs.create false
 RUN apt-get install -y graphviz libgraphviz-dev
