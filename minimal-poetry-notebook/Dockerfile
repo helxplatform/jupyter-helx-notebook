@@ -11,7 +11,8 @@ RUN sudo apt-get install software-properties-common -y && \
 
 # These packages are necessary for some Poetry packages to correctly install later (like xmlsec) and LDAP
 RUN apt-get install -y pkg-config libxml2-dev libxmlsec1-dev \
-    libxmlsec1-openssl curl git libc-bin locales libcurl3-gnutls libnss-ldap
+    libxmlsec1-openssl curl git libc-bin locales libcurl3-gnutls libnss-ldap \
+    unixodbc-dev gcc g++
 
 # These packages are necessary for psycopg2 to be installed later
 RUN apt-get install -y build-essential python3-dev libpq-dev libpq-dev
@@ -21,6 +22,11 @@ RUN pip install psycopg2
 
 # Fix vulnerabilities with old packages
 RUN apt-get upgrade -y libaom3 openexr zlib1g-dev
+
+# Update certificates
+RUN curl -L https://curl.se/ca/cacert.pem -o /usr/local/share/ca-certificates/mozilla-latest.crt && \
+    update-ca-certificates --fresh
+
 
 # Install pipx
 RUN python3 -m pip install pipx && pipx ensurepath
