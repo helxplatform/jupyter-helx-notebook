@@ -34,4 +34,7 @@ RUN fix-permissions "/home" && \
 
 USER $NB_USER
 
+# Set a custom prompt for the user that's more pleasant to read in the terminal
+ENV PS1="\[\033[32m\]\u\[\033[00m\]:\[\033[34m\]\w\[\033[00m\]\$ "
+
 CMD ["/init.sh"]
