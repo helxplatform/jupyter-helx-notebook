@@ -19,6 +19,8 @@ RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry install --no-interaction --no-ans
 # Remove Poetry files from container, as they're no longer needed
 RUN rm $POETRY_HOME/pyproject.toml $POETRY_HOME/poetry.lock
 
+RUN python3 -m pip install jupyterlab-git
+
 # # These are installed in scipy-notebook: pandas scikit-learn scipy seaborn sqlalchemy statsmodels
 # RUN apt-get update && apt-get -y install pkg-config && \
 #     mamba install --yes \
