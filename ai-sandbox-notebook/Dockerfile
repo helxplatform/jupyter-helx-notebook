@@ -33,3 +33,5 @@ RUN fix-permissions "/home" && \
     chmod 664 /etc/group
 
 USER $NB_USER
+
+CMD ["/init.sh"]
