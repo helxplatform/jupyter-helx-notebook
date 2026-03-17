@@ -10,13 +10,20 @@ WORKDIR /
 RUN apt-get update
 # This is necessary because by default Poetry creates a virtual environment, which we don't want in production
 RUN $POETRY_HOME/bin/poetry config virtualenvs.create false
-RUN apt-get install -y graphviz libgraphviz-dev
+RUN apt-get install -y graphviz libgraphviz-dev vim poppler-utils
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+# Upgrade Node.js first
+RUN conda install -c conda-forge nodejs=20 -y
+
+RUN npm i -g @openai/codex
+RUN npm i -g @anthropic-ai/claude-code
+
 # Copy poetry files to container
 COPY pyproject.toml poetry.lock $POETRY_HOME/
 # Run `poetry install`
 RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry lock
 
-RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry install --no-interaction --no-ansi --no-root --no-cache
+RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry install --no-interaction --no-ansi --no-root --no-cache --extras "agents rag jupyter-ai"
 RUN pip install --upgrade jupyter
 RUN pip install --upgrade ipywidgets
 # Remove Poetry files from container, as they're no longer needed
@@ -26,3 +33,5 @@ RUN fix-permissions "/home" && \
     chmod 664 /etc/group
 
 USER $NB_USER
+
+CMD ["/init.sh"]
