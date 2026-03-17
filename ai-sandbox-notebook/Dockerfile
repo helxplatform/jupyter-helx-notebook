@@ -5,7 +5,7 @@ FROM $BASE_IMAGE:$BASE_IMAGE_TAG
 USER root
 
 WORKDIR /
-# COPY root .
+COPY root .
 
 RUN apt-get update
 # This is necessary because by default Poetry creates a virtual environment, which we don't want in production
