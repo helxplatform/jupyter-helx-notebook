@@ -12,13 +12,11 @@ RUN apt-get update
 RUN $POETRY_HOME/bin/poetry config virtualenvs.create false
 RUN apt-get install -y graphviz libgraphviz-dev vim poppler-utils
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-RUN curl -fsSL https://claude.ai/install.sh | bash
-RUN mkdir -p /usr/local/lib/node_modules && \
-    chmod -R 777 /usr/local/lib/node_modules && \
-    chmod -R 777 /usr/local/bin && \
-    npm i -g @openai/codex
-# RUN npm i -g @openai/codex
-RUN echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
+# Upgrade Node.js first
+RUN conda install -c conda-forge nodejs=20 -y
+
+RUN npm i -g @openai/codex
+RUN npm i -g @anthropic-ai/claude-code
 
 # Copy poetry files to container
 COPY pyproject.toml poetry.lock $POETRY_HOME/
