@@ -10,7 +10,7 @@ COPY root .
 RUN apt-get update
 # This is necessary because by default Poetry creates a virtual environment, which we don't want in production
 RUN $POETRY_HOME/bin/poetry config virtualenvs.create false
-RUN apt-get install -y graphviz libgraphviz-dev vim poppler-utils
+RUN apt-get install -y graphviz libgraphviz-dev vim poppler-utils git
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 # Upgrade Node.js first
 RUN conda install -c conda-forge nodejs=20 -y
@@ -23,9 +23,16 @@ COPY pyproject.toml poetry.lock $POETRY_HOME/
 # Run `poetry install`
 RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry lock
 
-RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry install --no-interaction --no-ansi --no-root --no-cache --extras "agents rag jupyter-ai"
+RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry install --no-interaction --no-ansi --no-root --no-cache --extras "agents rag"
 RUN pip install --upgrade jupyter
 RUN pip install --upgrade ipywidgets
+RUN pip install 'jupyter-ai==3.0.0b7' 'jupyter-ai-magics==3.0.0b7' 'jupyter-ai-litellm==0.0.2' 'jupyterlab-chat==0.17.0' 'langgraph'
+RUN pip uninstall -y 'jupyter_ai_router' 'jupyter-ai-persona-manager'
+
+# Install goodbot (custom Jupyter-AI persona)
+RUN git clone https://github.com/satusky/hackathon_jupyter_persona.git
+RUN pip install -e hackathon_jupyter_persona
+
 # Remove Poetry files from container, as they're no longer needed
 RUN rm $POETRY_HOME/pyproject.toml $POETRY_HOME/poetry.lock
 
@@ -33,8 +40,5 @@ RUN fix-permissions "/home" && \
     chmod 664 /etc/group
 
 USER $NB_USER
-
-# Set a custom prompt for the user that's more pleasant to read in the terminal
-ENV PS1="\[\033[32m\]\u\[\033[00m\]:\[\033[34m\]\w\[\033[00m\]\$ "
 
 CMD ["/init.sh"]

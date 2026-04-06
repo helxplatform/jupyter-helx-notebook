@@ -17,7 +17,11 @@ export USER=${USER-"jovyan"}
 export DEFAULT_USER="jovyan"
 export HOME="/home/$USER"
 export NB_ROOT_DIR=${NB_ROOT_DIR-$HOME}
-export JUPYTER_AI_DEFAULT_MODEL=${JUPYTER_AI_DEFAULT_MODEL-"openai:gpt-5"}
+export JUPYTER_AI_DEFAULT_MODEL=${JUPYTER_AI_DEFAULT_MODEL-"openai/gpt-5"}
+export JUPYTER_AI_DEFAULT_PERSONA=${JUPYTER_AI_DEFAULT_PERSONA-"jupyter-ai-personas::goodbot::GoodBotPersona"}
+export GOODBOT_STORE_IDS_PATH="$HOME/.goodbot/store_ids.json"
+# Set a custom prompt for the user that's more pleasant to read in the terminal
+export PROMPT_COMMAND='PS1="\[\033[32m\]\u\[\033[00m\]:\[\033[34m\]\w\[\033[00m\]\$ "'
 
 # Change to the root directory to mitigate problems if the current working
 # directory is deleted.
@@ -49,4 +53,6 @@ jupyter lab \
     --ServerApp.allow_origin="*" \
     --ServerApp.root_dir=${NB_ROOT_DIR} \
     --ServerApp.default_url=${NB_PREFIX}/lab \
-    --AiExtension.default_language_model=${JUPYTER_AI_DEFAULT_MODEL}
+    --AiExtension.default_language_model=${JUPYTER_AI_DEFAULT_MODEL} \
+    --AiExtension.initial_language_model=${JUPYTER_AI_DEFAULT_MODEL} \
+    --PersonaManager.default_persona_id=${JUPYTER_AI_DEFAULT_PERSONA}
