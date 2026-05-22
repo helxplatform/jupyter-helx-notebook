@@ -26,12 +26,7 @@ RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry lock
 RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry install --no-interaction --no-ansi --no-root --no-cache --extras "agents rag"
 RUN pip install --upgrade jupyter
 RUN pip install --upgrade ipywidgets
-RUN pip install 'jupyter-ai==3.0.0b7' 'jupyter-ai-magics==3.0.0b7' 'jupyter-ai-litellm==0.0.2' 'jupyterlab-chat==0.17.0' 'langgraph'
-RUN pip uninstall -y 'jupyter_ai_router' 'jupyter-ai-persona-manager'
-
-# Install goodbot (custom Jupyter-AI persona)
-RUN git clone https://github.com/satusky/hackathon_jupyter_persona.git
-RUN pip install -e hackathon_jupyter_persona
+RUN pip install 'jupyter-ai==3.0.0b7' 'jupyter-ai-magics==3.0.0b7' 'jupyter-ai-litellm==0.0.2' 'jupyterlab-chat==0.17.0' 'langgraph' 'openpyxl'
 
 # Remove Poetry files from container, as they're no longer needed
 RUN rm $POETRY_HOME/pyproject.toml $POETRY_HOME/poetry.lock
