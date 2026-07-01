@@ -26,7 +26,11 @@ RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry lock
 RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry install --no-interaction --no-ansi --no-root --no-cache --extras "agents rag"
 RUN pip install --upgrade jupyter
 RUN pip install --upgrade ipywidgets
-RUN pip install 'jupyter-ai==3.0.0b7' 'jupyter-ai-magics==3.0.0b7' 'jupyter-ai-litellm==0.0.2' 'jupyterlab-chat==0.17.0' 'langgraph' 'openpyxl'
+RUN pip install \
+    'jupyter-ai==3.0.0b7' \
+    'jupyter-ai-magics==3.0.0b7' \
+    'jupyter-ai-litellm==0.0.2' \
+    'jupyterlab-chat==0.17.0'
 
 # Remove Poetry files from container, as they're no longer needed
 RUN rm $POETRY_HOME/pyproject.toml $POETRY_HOME/poetry.lock
