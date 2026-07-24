@@ -39,10 +39,25 @@ cd $HOME
 # create the directory if it doesn't exist.
 export XDG_CACHE_HOME=$HOME/.cache
 
+# HelxIdentityProvider resolves the jupyter identity (shown on collaborator
+# cursors in shared RTC documents) from $USER instead of a random anonymous
+# name. RTC itself is enabled simply by jupyter-collaboration being installed.
+# Guarded: an unimportable provider is a fatal ServerApp config error, so fall
+# back to the anonymous identity rather than crashlooping the pod if this
+# image is missing /helx/lib or the module is broken.
+IDENTITY_PROVIDER_ARG=""
+if PYTHONPATH=/helx/lib${PYTHONPATH:+:$PYTHONPATH} python -c "import helx_identity" 2>/dev/null; then
+  export PYTHONPATH=/helx/lib${PYTHONPATH:+:$PYTHONPATH}
+  IDENTITY_PROVIDER_ARG="--ServerApp.identity_provider_class=helx_identity.HelxIdentityProvider"
+else
+  echo "WARN: helx_identity not importable; collaborator cursors will show anonymous names"
+fi
+
 # Run "jupyter -h" to see some options (notebook, server, lab, etc.).  To get more
 # options run "jupyter server --help-all".
 jupyter lab \
     --IdentityProvider.token= \
+    $IDENTITY_PROVIDER_ARG \
     --ServerApp.ip='*' \
     --ServerApp.base_url=${NB_PREFIX} \
     --ServerApp.allow_origin="*" \

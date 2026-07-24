@@ -44,7 +44,30 @@ RUN pipx inject poetry poetry-plugin-bundle
 # Make sure poetry is installed
 RUN poetry --version
 
+# Pin the JupyterLab real-time collaboration (RTC) stack. These versions must
+# stay in lockstep across all derived notebook images and the collab broker
+# deployment (helx-chart/charts/jupyter-collab-broker), which runs this image:
+# ydoc schema or fileid behavior skew between user pods and the broker breaks
+# shared-document rooms.
+RUN pip install \
+    'jupyterlab==4.4.7' \
+    'jupyter-collaboration==4.2.1' \
+    'jupyter-server-ydoc==2.2.1' \
+    'jupyter-docprovider==2.4.1' \
+    'jupyter-collaboration-ui==2.4.1' \
+    'jupyter-ydoc==3.1.0' \
+    'jupyter-server-fileid==0.9.3' \
+    'pycrdt-websocket==0.16.0' \
+    'jupyterlab-chat==0.17.0'
+
 COPY root /
+
+# Install the helx python helpers (helx_identity, helx_fileid) into
+# site-packages so they are importable by every python process without
+# depending on PYTHONPATH surviving the pod's runtime environment (init.sh
+# still exports PYTHONPATH=/helx/lib as a fallback). helx_fileid is used by the
+# collaboration broker; helx_identity by the notebook servers.
+RUN cp /helx/lib/*.py "$(python -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')/"
 
 RUN fix-permissions "/home" && \
     chmod 664 /etc/group
