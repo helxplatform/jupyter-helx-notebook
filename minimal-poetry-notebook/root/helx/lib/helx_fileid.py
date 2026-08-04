@@ -22,7 +22,18 @@ still indexed normally, and ``index()`` keeps its disk-checking behavior
 (returns None for paths not present under root_dir), which the resty proxy
 relies on to fall back to a user's own pod for private files.
 
-NOTE: this overrides two private methods of LocalFileIdManager (0.9.3). If
+It also folds inode numbers into 63 bits. ``LocalFileIdManager`` keys every
+file on ``st_ino`` and stores it in a SQLite ``INTEGER`` column (max signed
+2**63-1). The HeLx shared storage (Azure Files / Ceph-style) hands out
+synthetic inode numbers >= 2**63, which SQLite's driver refuses to bind
+(``OverflowError: Python int too large to convert to SQLite INTEGER``),
+aborting the whole fileid extension. ``_parse_raw_stat`` is the single place
+``stat_info.ino`` is populated, so masking it there makes every downstream
+query consistent. Dropping the top bit can only collide two inodes that differ
+solely in bit 63 (astronomically unlikely), and the schema's ``UNIQUE(ino)``
+constraint would turn even that into a harmless re-index, not corruption.
+
+NOTE: this overrides private methods of LocalFileIdManager (0.9.3). If
 jupyter-server-fileid is upgraded, re-verify that these method names/bodies
 still match; the pin lives in minimal-poetry-notebook's Dockerfile.
 """
@@ -30,8 +41,19 @@ import os
 
 from jupyter_server_fileid.manager import LocalFileIdManager
 
+# SQLite INTEGER is signed 64-bit; inodes must fit in its positive range.
+_INO_MASK = (1 << 63) - 1
+
 
 class HelxLocalFileIdManager(LocalFileIdManager):
+    def _parse_raw_stat(self, raw_stat):
+        """Fold the inode into 63 bits so oversized (>= 2**63) inode numbers
+        from the shared filesystem fit in SQLite's signed INTEGER column."""
+        stat_info = super()._parse_raw_stat(raw_stat)
+        if stat_info.ino is not None:
+            stat_info.ino = stat_info.ino & _INO_MASK
+        return stat_info
+
     def _scandir_safe(self, dir_path):
         """os.scandir that yields nothing (with a warning) if the directory
         cannot be opened, instead of raising. Mirrors _stat's existing

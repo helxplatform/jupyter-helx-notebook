@@ -1,4 +1,6 @@
-FROM docker.io/library/minimal-poetry-notebook
+ARG BASE_IMAGE=containers.renci.org/helxplatform/jupyter/minimal-poetry-notebook
+ARG BASE_IMAGE_TAG=python-3.10
+FROM $BASE_IMAGE:$BASE_IMAGE_TAG
 
 USER root
 
