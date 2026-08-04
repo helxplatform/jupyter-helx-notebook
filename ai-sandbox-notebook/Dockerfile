@@ -1,6 +1,4 @@
-ARG BASE_IMAGE=containers.renci.org/helxplatform/jupyter/minimal-poetry-notebook
-ARG BASE_IMAGE_TAG=python-3.10
-FROM $BASE_IMAGE:$BASE_IMAGE_TAG
+FROM docker.io/library/minimal-poetry-notebook
 
 USER root
 
@@ -20,9 +18,6 @@ RUN npm i -g @anthropic-ai/claude-code
 
 # Copy poetry files to container
 COPY pyproject.toml poetry.lock $POETRY_HOME/
-# Run `poetry install`
-RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry lock
-
 RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry install --no-interaction --no-ansi --no-root --no-cache --extras "agents rag"
 RUN pip install --upgrade jupyter
 RUN pip install --upgrade ipywidgets
@@ -30,7 +25,9 @@ RUN pip install \
     'jupyter-ai==3.0.0b7' \
     'jupyter-ai-magics==3.0.0b7' \
     'jupyter-ai-litellm==0.0.2' \
-    'jupyterlab-chat==0.17.0'
+    'jupyterlab-chat==0.17.0' \
+    'jupyter-ydoc<3.5.0' \
+    'jupyter-server-ydoc<2.4.1'
 
 # Remove Poetry files from container, as they're no longer needed
 RUN rm $POETRY_HOME/pyproject.toml $POETRY_HOME/poetry.lock
