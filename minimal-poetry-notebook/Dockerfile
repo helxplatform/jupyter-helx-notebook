@@ -63,6 +63,15 @@ RUN pipx inject poetry poetry-plugin-bundle
 # Make sure poetry is installed
 RUN poetry --version
 
+# Vulnerability fix
+# nbclassic is the deprecated Notebook 6 UI. docker-stacks explicitly installs it,
+# but nothing really depends on it, and the tree (nbclassic) UI is no longer in use.
+# Could be added back just for the sake of supporting /tree (if a user were to want it)
+# once downstream requirements have vuln fixes.
+RUN mamba remove -y --force nbclassic && \
+    mamba clean --all -f -y && \
+    fix-permissions "${CONDA_DIR}"
+
 COPY root /
 
 RUN fix-permissions "/home" && \
