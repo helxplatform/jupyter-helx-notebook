@@ -23,21 +23,19 @@ FROM quay.io/jupyter/minimal-notebook:latest
 
 USER root
 
-# Update available packages in the package index
-RUN apt-get update && apt-get upgrade -y
-
-# Add the git ppa, then drop software-properties-common again
-RUN apt-get install -y --no-install-recommends software-properties-common && \
+# software-properties-common is only needed for add-apt-repository; purged
+# afterwards because it drags in packagekit/polkit/systemd. Runtime shared
+# libraries only -- the matching -dev packages are build-time artifacts and live
+# in the builder stage.
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends software-properties-common && \
     add-apt-repository -y ppa:git-core/ppa && \
     apt-get update && \
-    apt-get install -y --no-install-recommends git && \
-    apt-get purge -y --auto-remove software-properties-common
-
-# Runtime shared libraries only. The matching -dev packages are build-time artifacts.
-RUN apt-get install -y --no-install-recommends \
-      curl libc-bin locales libcurl3-gnutls libnss-ldap \
-      libpq5 libxml2 libxslt1.1 libxmlsec1t64 libodbc2 \
- && apt-get clean && rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+      git curl libc-bin locales libcurl3-gnutls libnss-ldap \
+      libpq5 libxml2 libxslt1.1 libxmlsec1t64 libodbc2 && \
+    apt-get purge -y --auto-remove software-properties-common && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install psycopg2 from the wheel built in stage 1 (links against libpq5)
 RUN --mount=from=builder,source=/wheels,target=/wheels \
