@@ -1,48 +1,74 @@
-FROM containers.renci.org/helxplatform/jupyter/docker-stacks/minimal-notebook:latest
+###############################################################################
+# Stage 1: builder
+#
+# psycopg2 is the only thing in this image that has to be compiled from source.
+# The toolchain it needs (build-essential -> gcc -> libc6-dev -> linux-libc-dev)
+# tends to introduce a large number (1k+) CVEs, so we want to keep them out of the
+# final image
+###############################################################################
+FROM quay.io/jupyter/minimal-notebook:latest AS builder
 
 USER root
 
-# Update available packages in the package index
-RUN apt-get update && apt-get upgrade -y
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential python3-dev libpq-dev \
+ && rm -rf /var/lib/apt/lists/*
 
-# Add ppa for git install later
-RUN sudo apt-get install software-properties-common -y && \
-    sudo add-apt-repository ppa:git-core/ppa
+RUN pip wheel --no-deps --wheel-dir /wheels psycopg2
 
-# These packages are necessary for some Poetry packages to correctly install later (like xmlsec) and LDAP
-RUN apt-get install -y pkg-config libxml2-dev libxmlsec1-dev \
-    libxmlsec1-openssl curl git libc-bin locales libcurl3-gnutls libnss-ldap \
-    unixodbc-dev gcc g++
+###############################################################################
+# Stage 2: runtime
+###############################################################################
+FROM quay.io/jupyter/minimal-notebook:latest
 
-# These packages are necessary for psycopg2 to be installed later
-RUN apt-get install -y build-essential python3-dev libpq-dev libpq-dev
+USER root
 
-# Install psycopg2 using regular pip
-RUN pip install psycopg2
+# software-properties-common is only needed for add-apt-repository; purged
+# afterwards because it drags in packagekit/polkit/systemd. Runtime shared
+# libraries only -- the matching -dev packages are build-time artifacts and live
+# in the builder stage.
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends software-properties-common && \
+    add-apt-repository -y ppa:git-core/ppa && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+      git curl libc-bin locales libcurl3-gnutls libnss-ldap \
+      libpq5 libxml2 libxslt1.1 libxmlsec1t64 libodbc2 && \
+    apt-get purge -y --auto-remove software-properties-common && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Fix vulnerabilities with old packages
-RUN apt-get upgrade -y libaom3 openexr zlib1g-dev
+# Install psycopg2 from the wheel built in stage 1 (links against libpq5)
+RUN --mount=from=builder,source=/wheels,target=/wheels \
+    pip install --no-cache-dir --no-index --find-links=/wheels psycopg2
 
 # Update certificates
 RUN curl -L https://curl.se/ca/cacert.pem -o /usr/local/share/ca-certificates/mozilla-latest.crt && \
     update-ca-certificates --fresh
 
-
 # Install pipx
-RUN python3 -m pip install pipx && pipx ensurepath
+RUN python3 -m pip install --no-cache-dir pipx && pipx ensurepath
 
 # Set $POETRY_HOME env var for child images to reference and add it to the $PATH
 ENV POETRY_HOME="${HOME}/.local"
 ENV PATH="${POETRY_HOME}/bin:$PATH"
 
 # Install Poetry
-RUN pipx install poetry==2.1.1
+RUN pipx install poetry==2.4.1
 
 # Install Poetry's bundle plugin to install cleanly in a virtual environment
 RUN pipx inject poetry poetry-plugin-bundle
 
 # Make sure poetry is installed
 RUN poetry --version
+
+# Vulnerability fix
+# nbclassic is the deprecated Notebook 6 UI. docker-stacks explicitly installs it,
+# but nothing really depends on it, and the nbclassic UI is no longer in use.
+# Could be added back just for the sake of supporting /nbclassic (if a user were to want it)
+# once downstream requirements have vuln fixes.
+RUN mamba remove -y --force nbclassic && \
+    mamba clean --all -f -y && \
+    fix-permissions "${CONDA_DIR}"
 
 COPY root /
 
