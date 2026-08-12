@@ -2,6 +2,14 @@
 
 set -eoux pipefail
 
+if [ "${USER_IDENTITY:-}" = "ldap" ]; then
+  # When USER_IDENTITY is ldap, do only the default‐environment copy logic
+  if [ ! -f "$HOME/.bashrc" ]; then
+      cp /etc/skel/.bashrc "$HOME/.bashrc"
+  fi
+  exit 0
+fi
+
 HELX_GROUP_NAME=${HELX_GROUP_NAME-"helx"}
 DELETE_DEFAULT_USER_HOME_IF_UNUSED=${DELETE_DEFAULT_USER_HOME_IF_UNUSED-"yes"}
 declare -i DEFAULT_UID=1000
