@@ -32,7 +32,7 @@ RUN apt-get update && apt-get upgrade -y && \
     add-apt-repository -y ppa:git-core/ppa && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-      git curl libc-bin locales libcurl3-gnutls libnss-ldap \
+      git curl libc-bin locales libcurl3-gnutls libnss-ldapd \
       libpq5 libxml2 libxslt1.1 libxmlsec1t64 libodbc2 && \
     apt-get purge -y --auto-remove software-properties-common && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
