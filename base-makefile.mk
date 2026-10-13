@@ -38,7 +38,7 @@ build-nc: ## Build the image without caching.
 		--build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
 		-t ${APP_NAME}
 
-build-with-logs: ## Build the image without caching.
+build-with-logs: ## Build the image, logging progress.
 	docker build --pull \
 		--progress=plain \
 		--platform=linux/amd64 . \
