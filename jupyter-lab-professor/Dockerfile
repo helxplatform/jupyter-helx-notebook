@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=containers.renci.org/helxplatform/jupyter/minimal-poetry-notebook
-ARG BASE_IMAGE_TAG=v0.0.4
+ARG BASE_IMAGE_TAG=latest
 FROM $BASE_IMAGE:$BASE_IMAGE_TAG
 
 USER root
@@ -23,7 +23,14 @@ RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry install --no-interaction --no-ans
 # Remove Poetry files from container, as they're no longer needed
 RUN rm $POETRY_HOME/pyproject.toml $POETRY_HOME/poetry.lock
 
-RUN pip install git+https://github.com/helxplatform/eduhelx-jupyterlab-prof-ext.git@hotfix-12-18-2024
+# The extension is only published as source, and building its labextension needs
+# Node.js. The base image doesn't ship Node, so install it just for this step and
+# remove it afterwards to keep it (and its CVEs) out of the final image.
+RUN mamba install -y -n base -c conda-forge nodejs=22 && \
+    pip install --no-cache-dir git+https://github.com/helxplatform/eduhelx-jupyterlab-prof-ext.git@hotfix-12-18-2024 && \
+    mamba remove -y -n base nodejs && \
+    mamba clean --all -f -y && \
+    fix-permissions "${CONDA_DIR}"
 RUN jupyter server extension enable eduhelx_jupyterlab_prof
 
 RUN pip install --upgrade git+https://github.com/helxplatform/eduhelx-utils.git
