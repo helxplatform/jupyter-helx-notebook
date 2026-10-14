@@ -12,8 +12,14 @@ RUN apt-get update
 RUN $POETRY_HOME/bin/poetry config virtualenvs.create false
 RUN apt-get install -y graphviz libgraphviz-dev vim poppler-utils git
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-# Upgrade Node.js first
-RUN conda install -c conda-forge nodejs=20 -y
+# Upgrade Node.js first. Node 20 is EOL and @anthropic-ai/claude-code needs >=22.
+# The npm bundled with Node lags behind; update it so its vendored deps (tar,
+# minimatch, brace-expansion, ...) pick up security fixes. Then drop the conda
+# package cache, which otherwise keeps a second copy of the old npm around.
+RUN conda install -c conda-forge nodejs=24 -y && \
+    npm i -g npm@11 && \
+    npm cache clean --force && \
+    conda clean -afy
 
 RUN npm i -g @openai/codex
 RUN npm i -g @anthropic-ai/claude-code
