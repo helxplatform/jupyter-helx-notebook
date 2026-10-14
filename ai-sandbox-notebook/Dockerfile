@@ -1,4 +1,6 @@
-FROM docker.io/library/minimal-poetry-notebook
+ARG BASE_IMAGE=containers.renci.org/helxplatform/jupyter/minimal-poetry-notebook
+ARG BASE_IMAGE_TAG=latest
+FROM $BASE_IMAGE:$BASE_IMAGE_TAG
 
 USER root
 
@@ -24,7 +26,7 @@ RUN pip install --upgrade ipywidgets
 RUN pip install \
     'jupyter-ai==3.0.0b7' \
     'jupyter-ai-magics==3.0.0b7' \
-    'jupyter-ai-litellm==0.0.2' \
+    'jupyter-ai-litellm==0.1.0' \
     'jupyterlab-chat==0.17.0' \
     'jupyter-ydoc<3.5.0' \
     'jupyter-server-ydoc<2.4.1'
