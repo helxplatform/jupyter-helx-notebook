@@ -20,12 +20,12 @@ RUN npm i -g @anthropic-ai/claude-code
 COPY pyproject.toml poetry.lock $POETRY_HOME/
 RUN cd $POETRY_HOME && $POETRY_HOME/bin/poetry install --no-interaction --no-ansi --no-root --no-cache --extras "agents rag"
 RUN pip install --upgrade jupyter
-RUN pip install --upgrade ipywidgets
 RUN pip install \
-    'jupyter-ai==3.0.0b7' \
-    'jupyter-ai-magics==3.0.0b7' \
-    'jupyter-ai-litellm==0.0.2' \
-    'jupyterlab-chat==0.17.0' \
+    'jupyter-ai[jupyternaut,magics,rtc]==3.2.0' \
+    'jupyter-ai-jupyternaut==0.1.0' \
+    'jupyter-ai-magic-commands==0.0.4' \
+    'jupyter-ai-litellm==0.1.0' \
+    'jupyterlab-chat==0.25.1' \
     'jupyter-ydoc<3.5.0' \
     'jupyter-server-ydoc<2.4.1'
 

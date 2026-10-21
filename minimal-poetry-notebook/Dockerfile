@@ -1,4 +1,4 @@
-FROM containers.renci.org/helxplatform/jupyter/docker-stacks/minimal-notebook:3.10
+FROM quay.io/jupyter/minimal-notebook:python-3.12
 
 USER root
 

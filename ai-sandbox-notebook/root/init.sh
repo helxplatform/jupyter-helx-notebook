@@ -52,4 +52,4 @@ jupyter lab \
     --ServerApp.root_dir=${NB_ROOT_DIR} \
     --ServerApp.default_url=${NB_PREFIX}/lab \
     --AiExtension.default_language_model=${JUPYTER_AI_DEFAULT_MODEL} \
-    --AiExtension.initial_language_model=${JUPYTER_AI_DEFAULT_MODEL}
+    --JupyternautExtension.initial_language_model=${JUPYTER_AI_DEFAULT_MODEL}
