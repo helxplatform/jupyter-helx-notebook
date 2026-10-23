@@ -6,7 +6,7 @@ authors = ["Tyler Cheek <tylerlcheek@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.13,<3.14"
 matplotlib = "^3.9.2"
 psycopg = "^3.2.2"
 pyodbc = "^5.2.0"

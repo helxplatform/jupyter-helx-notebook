@@ -1,0 +1,131 @@
+[tool.poetry]
+name = "ai-sandbox-notebook"
+version = "0.0.3"
+description = ""
+authors = ["Hina <hinashah@renci.org>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "~3.13"
+
+# ── Jupyter Environment ──────────────────────────────────────────────────
+jupyterlab = "4.4.7"
+notebook = "7.4.5"
+ipykernel = "6.30.1"
+ipywidgets = "^8.1.0"
+
+# ── Azure Services (OCR & Infrastructure) ────────────────────────────────
+azure-core = "1.35.0"
+azure-identity = "^1.21.0"
+azure-ai-formrecognizer = "^3.3.0"
+azure-cognitiveservices-vision-computervision = "^0.9.0"
+azure-storage-blob = "^12.25.0"
+mistralai = "2.0.0"
+
+# ── Image Processing ─────────────────────────────────────────────────────
+pillow = "12.3.0"
+pdf2image = "1.17.0"
+
+# ── Geotagging & Mapping ─────────────────────────────────────────────────
+exifread = "^3.1.0"
+piexif = "^1.1.3"
+geopy = "^2.4.0"
+folium = "^0.19.0"
+
+# ── Data Science & Visualization ─────────────────────────────────────────
+numpy = "2.1.3"
+pandas = "2.3.2"
+matplotlib = "3.10.6"
+seaborn = "0.13.2"
+scipy = "1.15.3"
+scikit-learn = "1.7.2"
+altair = "5.5.0"
+
+# ── NLP & Text Processing ────────────────────────────────────────────────
+nltk = "3.10.3"
+textblob = "0.19.0"
+regex = "2025.9.1"
+
+# ── LLM Integration (for post-OCR processing) ───────────────────────────
+openai = "^2.22.0"
+anthropic = "^0.66.0"
+tiktoken = "^0.11.0"
+litellm = "^1.104.2"
+langchain = "^0.3.27"
+langchain-core = "^0.3.75"
+langchain-openai = "^0.3.32"
+langchain-community = "^0.3.29"
+langchain-text-splitters = "^0.3.11"
+
+# ── Vector Search & Retrieval (if indexing OCR results) ──────────────────
+faiss-cpu = "^1.12.0"
+sentence-transformers = "^5.6.0"
+
+# ── Modeling ─────────────────────────────────────────────────────────────
+vivarium-core = "^1.6.5"
+vivarium-cell = "^0.1.5"
+
+# ── Networking & HTTP ────────────────────────────────────────────────────
+requests = "^2.32.0"
+httpx = "^0.28.0"
+aiohttp = "^3.12.0"
+
+# ── Utilities ────────────────────────────────────────────────────────────
+python-dotenv = "^1.1.0"
+pydantic = "^2.11.0"
+pydantic-settings = "^2.10.0"
+tqdm = "^4.67.0"
+rich = "^14.1.0"
+beautifulsoup4 = "^4.13.0"
+PyYAML = "^6.0.0"
+tabulate = "^0.9.0"
+orjson = "^3.11.0"
+Jinja2 = "^3.1.0"
+SQLAlchemy = "2.0.43"
+psycopg2-binary = "2.9.10"
+openpyxl = "^3.1.5"
+
+# ── Optional dependencies (install with: poetry install --extras "ml") ───
+# Heavy ML frameworks
+torch = { version = "^2.7.0", optional = true }
+torchvision = { version = "^0.22.0", optional = true }
+transformers = { version = "^4.53.0", optional = true }
+accelerate = { version = "^1.10.0", optional = true }
+tensorflow = { version = "^2.19.0", optional = true }
+keras = { version = "^3.11.0", optional = true }
+
+# LangGraph / Agentic workflows
+langgraph = { version = "^0.6.7", optional = true }
+langgraph-sdk = { version = "^0.2.7", optional = true }
+langgraph-prebuilt = { version = "^0.6.4", optional = true }
+langgraph-checkpoint = { version = "^2.1.1", optional = true }
+langsmith = { version = "^0.4.27", optional = true }
+
+# Additional vector stores
+pymilvus = { version = "^2.6.0", optional = true }
+qdrant-client = { version = "^1.15.0", optional = true }
+
+# RAG utilities
+llama-index-core = { version = "^0.14.0", optional = true }
+semantic-router = { version = "^0.1.15", optional = true }
+semantic-chunkers = { version = "^0.1.1", optional = true }
+bm25s = { version = "^0.2.14", optional = true }
+
+[tool.poetry.extras]
+ml = ["torch", "torchvision", "transformers", "accelerate", "tensorflow", "keras"]
+agents = ["langgraph", "langgraph-sdk", "langgraph-prebuilt", "langgraph-checkpoint", "langsmith"]
+vectorstores = ["pymilvus", "qdrant-client"]
+rag = ["llama-index-core", "semantic-router", "semantic-chunkers", "bm25s"]
+jupyter-ai = ["jupyter-ai"]
+all = [
+    "torch", "torchvision", "transformers", "accelerate", "tensorflow", "keras",
+    "langgraph", "langgraph-sdk", "langgraph-prebuilt", "langgraph-checkpoint", "langsmith",
+    "pymilvus", "qdrant-client",
+    "llama-index-core", "semantic-router", "semantic-chunkers", "bm25s",
+    "jupyter-ai",
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

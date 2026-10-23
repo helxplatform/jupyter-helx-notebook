@@ -6,7 +6,9 @@
 # tends to introduce a large number (1k+) CVEs, so we want to keep them out of the
 # final image
 ###############################################################################
-FROM quay.io/jupyter/minimal-notebook:latest AS builder
+ARG BASE_IMAGE=quay.io/jupyter/minimal-notebook
+ARG BASE_IMAGE_TAG=2026-10-05
+FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG} AS builder
 
 USER root
 
@@ -19,7 +21,7 @@ RUN pip wheel --no-deps --wheel-dir /wheels psycopg2
 ###############################################################################
 # Stage 2: runtime
 ###############################################################################
-FROM quay.io/jupyter/minimal-notebook:latest
+FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG}
 
 USER root
 
@@ -32,8 +34,8 @@ RUN apt-get update && apt-get upgrade -y && \
     add-apt-repository -y ppa:git-core/ppa && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-      git curl libc-bin locales libcurl3-gnutls libnss-ldapd \
-      libpq5 libxml2 libxslt1.1 libxmlsec1t64 libodbc2 && \
+      git curl libc-bin locales libcurl3t64-gnutls libnss-ldapd \
+      libpq5 libxml2-16 libxslt1.1 libxmlsec1-1 libodbc2 && \
     apt-get purge -y --auto-remove software-properties-common && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -66,7 +68,7 @@ RUN poetry --version
 # but nothing really depends on it, and the nbclassic UI is no longer in use.
 # Could be added back just for the sake of supporting /nbclassic (if a user were to want it)
 # once downstream requirements have vuln fixes.
-RUN mamba remove -y --force nbclassic && \
+RUN mamba remove -y --force -n base nbclassic && \
     mamba clean --all -f -y && \
     fix-permissions "${CONDA_DIR}"
 
