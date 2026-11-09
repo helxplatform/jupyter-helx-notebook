@@ -22,6 +22,10 @@ export NB_ROOT_DIR=${NB_ROOT_DIR-$HOME}
 # directory is deleted.
 cd /
 
+# UNCDSR-182: /etc/group and /etc/passwd are re-seeded by entrypoint-reseed.sh
+# (the image's ENTRYPOINT) before this script runs, since the base image's own
+# start.sh reads /etc/passwd before this CMD ever executes.
+
 # Add other init scripts in $HELX_SCRIPTS_DIR with ".sh" as their extension.
 # To run in a certain order, name them appropriately.
 HELX_SCRIPT_DIR=/helx-startup

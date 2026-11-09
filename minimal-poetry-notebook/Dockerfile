@@ -75,8 +75,16 @@ RUN mamba remove -y --force -n base nbclassic && \
 COPY root /
 
 RUN fix-permissions "/home" && \
-    chmod 664 /etc/group
+    chmod 664 /etc/group && \
+    # UNCDSR-182: pristine, never-mounted-over backups that init.sh re-seeds
+    # /etc/group and /etc/passwd from on every boot. 10-user.sh needs to
+    # append a supplementary group entry to /etc/group, and rewrite the
+    # default user's /etc/passwd entry with the launching user's real
+    # UID/username, but the root filesystem is read-only.
+    cp /etc/group /etc/group.default && \
+    cp /etc/passwd /etc/passwd.default
 
 USER $NB_USER
 
+ENTRYPOINT ["/entrypoint-reseed.sh"]
 CMD ["/init.sh"]

@@ -30,7 +30,11 @@ else
       if [[ -d /home/$DEFAULT_USER ]]; then
         if [[ "$USER" != "$DEFAULT_USER" && "$DELETE_DEFAULT_USER_HOME_IF_UNUSED" == "yes" ]]; then
           echo "deleting /home/$DEFAULT_USER"
-          rm -rf /home/$DEFAULT_USER
+          # UNCDSR-182: /home/$DEFAULT_USER lives on the (now read-only) root
+          # filesystem, not on any mounted volume, so this cleanup can't
+          # succeed there. It's best-effort disk reclamation, not required for
+          # correctness, so a failure here must not abort container startup.
+          rm -rf /home/$DEFAULT_USER || true
         fi
       fi
 
