@@ -1,4 +1,6 @@
-FROM quay.io/jupyter/minimal-notebook:python-3.12
+ARG BASE_IMAGE=containers.renci.org/helxplatform/jupyter/docker-stacks/minimal-notebook
+ARG BASE_IMAGE_TAG=latest
+FROM $BASE_IMAGE:$BASE_IMAGE_TAG
 
 USER root
 

@@ -29,6 +29,19 @@ RUN pip install \
     'jupyter-ydoc<3.5.0' \
     'jupyter-server-ydoc<2.4.1'
 
+# RSNA Anonymizer pins numpy<2, so it gets its own environment and kernel.
+# torch, torchvision and their CUDA libraries are not installed into it; it uses
+# the notebook environment's copies via --system-site-packages, and the assert
+# fails the build if those drift from the versions in rsna-anonymizer/uv.lock.
+COPY rsna-anonymizer /opt/rsna-anonymizer
+RUN cd /opt/rsna-anonymizer && \
+    uv venv --system-site-packages --python $CONDA_DIR/bin/python .venv && \
+    uv sync --frozen --no-cache --python $CONDA_DIR/bin/python \
+        $(sed -En 's/^name = "(torch|torchvision|triton|nvidia-.*)"$/--no-install-package \1/p' uv.lock) && \
+    .venv/bin/python -c "import torch, torchvision; assert (torch.__version__, torchvision.__version__) == ('2.5.1+cu121', '0.20.1+cu121'), (torch.__version__, torchvision.__version__)" && \
+    ln -s /opt/rsna-anonymizer/.venv/bin/rsna-anonymizer /usr/local/bin/rsna-anonymizer && \
+    .venv/bin/python -m ipykernel install --prefix $CONDA_DIR --name rsna-anonymizer --display-name "RSNA Anonymizer"
+
 # Remove Poetry files from container, as they're no longer needed
 RUN rm $POETRY_HOME/pyproject.toml $POETRY_HOME/poetry.lock
 
