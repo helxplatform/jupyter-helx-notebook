@@ -1,0 +1,31 @@
+[project]
+name = "rsna-anonymizer-env"
+version = "0.0.0"
+requires-python = "==3.12.*"
+dependencies = [
+    "rsna-anonymizer==19.0.10",
+    "ipykernel",
+    # Must match the notebook environment's build: the image installs neither
+    # into this environment and imports both from there instead.
+    "torch==2.5.1+cu121",
+    "torchvision==0.20.1+cu121",
+]
+
+[tool.uv]
+package = false
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+# Drops xgboost's multi-GPU NCCL library, which nothing here uses, and
+# python-gdcm, whose bundled OpenSSL aborts on import on FIPS-enabled hosts.
+override-dependencies = [
+    "nvidia-nccl-cu13; sys_platform == 'never'",
+    "python-gdcm; sys_platform == 'never'",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu121"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu121" }
+torchvision = { index = "pytorch-cu121" }

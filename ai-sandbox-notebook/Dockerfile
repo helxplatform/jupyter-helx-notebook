@@ -3,18 +3,32 @@ FROM docker.io/library/minimal-poetry-notebook
 USER root
 
 WORKDIR /
-COPY root .
 
 RUN apt-get update
 # This is necessary because by default Poetry creates a virtual environment, which we don't want in production
 RUN $POETRY_HOME/bin/poetry config virtualenvs.create false
 RUN apt-get install -y graphviz libgraphviz-dev vim poppler-utils git
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-# Upgrade Node.js first
-RUN conda install -c conda-forge nodejs=20 -y
+# claude-agent-acp requires Node.js 22+
+RUN conda install -c conda-forge nodejs=26 -y
 
 RUN npm i -g @openai/codex
 RUN npm i -g @anthropic-ai/claude-code
+# jupyter-ai only enables its @Claude and @Codex chat personas when these ACP adapters are on PATH.
+RUN npm i -g @agentclientprotocol/claude-agent-acp@0.106.0 @agentclientprotocol/codex-acp@2.6.0
+
+# Skills and plugins live outside $HOME, since $HOME is the user's mounted volume at runtime.
+# Claude Code loads the Slack plugin, which carries the Slack MCP server, from CLAUDE_CODE_PLUGIN_DIRS on every
+# start, including jupyter-ai's @Claude sessions. Slack's Codex plugin ships only the skills, so Codex gets those.
+ENV CLAUDE_CODE_PLUGIN_DIRS=/opt/claude-plugins
+RUN git clone -q --depth 1 --branch v1.7.0 https://github.com/slackapi/slack-skills-plugin $CLAUDE_CODE_PLUGIN_DIRS/slack && \
+    rm -rf $CLAUDE_CODE_PLUGIN_DIRS/slack/.git && \
+    git clone -q https://github.com/langchain-ai/langchain-skills /tmp/langchain-skills && \
+    git -C /tmp/langchain-skills checkout -q 79f69154930ae1bc62a74a495ede558391861710 && \
+    mkdir -p /etc/claude-code/.claude/skills /etc/codex/skills && \
+    cp -r /tmp/langchain-skills/config/skills/* /etc/claude-code/.claude/skills/ && \
+    cp -r /tmp/langchain-skills/config/skills/* $CLAUDE_CODE_PLUGIN_DIRS/slack/skills/* /etc/codex/skills/ && \
+    rm -rf /tmp/langchain-skills
 
 # Copy poetry files to container
 COPY pyproject.toml poetry.lock $POETRY_HOME/
@@ -47,6 +61,8 @@ RUN rm $POETRY_HOME/pyproject.toml $POETRY_HOME/poetry.lock
 
 RUN fix-permissions "/home" && \
     chmod 664 /etc/group
+
+COPY root .
 
 USER $NB_USER
 

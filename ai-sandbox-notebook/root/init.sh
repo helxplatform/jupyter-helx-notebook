@@ -24,6 +24,11 @@ export PROMPT_COMMAND='PS1="\[\033[32m\]\u\[\033[00m\]:\[\033[34m\]\w\[\033[00m\
 # Jupyter AI config #
 #####################
 export JUPYTER_AI_DEFAULT_MODEL=${JUPYTER_AI_DEFAULT_MODEL-"openai/gpt-5"}
+# codex-acp logs in with CODEX_API_KEY/OPENAI_API_KEY only when DEFAULT_AUTH_REQUEST asks it to, and errors
+# out instead of prompting @Codex users to log in if it is set without a key. ':+x' keeps the keys out of the trace.
+if [ -n "${CODEX_API_KEY:+x}${OPENAI_API_KEY:+x}" ]; then
+  export DEFAULT_AUTH_REQUEST=${DEFAULT_AUTH_REQUEST-'{"methodId":"api-key"}'}
+fi
 
 # Add other init scripts in $HELX_SCRIPTS_DIR with ".sh" as their extension.
 # To run in a certain order, name them appropriately.
@@ -52,4 +57,5 @@ jupyter lab \
     --ServerApp.root_dir=${NB_ROOT_DIR} \
     --ServerApp.default_url=${NB_PREFIX}/lab \
     --AiExtension.default_language_model=${JUPYTER_AI_DEFAULT_MODEL} \
-    --JupyternautExtension.initial_language_model=${JUPYTER_AI_DEFAULT_MODEL}
+    --JupyternautExtension.initial_language_model=${JUPYTER_AI_DEFAULT_MODEL} \
+    --PersonaManager.default_persona_id=jupyter-ai-personas::jupyter_ai_jupyternaut::JupyternautPersona
